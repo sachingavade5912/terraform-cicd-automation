@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "Choose: plan, apply or destroy"
+        description: "Select Terraform action"
         required: true
         default: "plan"
         type: choice
@@ -16,14 +16,16 @@ on:
 permissions:
   contents: read
 
+env:
+  TF_DIR: infra
+  AWS_DEFAULT_REGION: us-east-1
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
     env:
-      TF_DIR: infra
-      AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-      AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-      AWS_DEFAULT_REGION: "ap-south-1"
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
       - name: Checkout repo
@@ -31,21 +33,22 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
- 
+
       - name: Terraform Init
         working-directory: ${{ env.TF_DIR }}
-        run: terraform init -input=false
+        run: terraform init
 
-      - name: Run Terraform Plan
+      - name: Terraform Plan
+        if: ${{ github.event.inputs.action == 'plan' }}
         working-directory: ${{ env.TF_DIR }}
         run: terraform plan
 
-      - name: Run Terraform Apply
-        if: ${{ github.event.inputs.action == apply' }}
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.action == 'apply' }}
         working-directory: ${{ env.TF_DIR }}
-        run: terraform apply --auto-approve
+        run: terraform apply -auto-approve
 
-      - name: Run Terraform Destroy
-        if: ${{ github.event.inputs.action == destroy' }}
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' }}
         working-directory: ${{ env.TF_DIR }}
-        run: terraform destroy --auto-approve
+        run: terraform destroy -auto-approve
