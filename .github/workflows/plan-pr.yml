@@ -7,12 +7,14 @@ on:
 
 env:
   DAY_OF_THE_WEEK: Monday
-  Greeting: Hello
-  Name: Mona
 
 jobs:
   greeting-job:
     runs-on: ubuntu-latest
+    env:
+      Greeting: Hello
     steps:
       - name: "Say Hello Mona its Monday"
         run: "$Greeting My name is $Name and today is $DAY_OF_THE_WEEK !"
+        env:
+         Name: Mona
