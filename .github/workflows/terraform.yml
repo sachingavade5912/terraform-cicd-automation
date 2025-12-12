@@ -18,7 +18,7 @@ permissions:
 
 env:
   TF_DIR: infra
-  AWS_DEFAULT_REGION: us-east-1
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
 jobs:
   terraform:
